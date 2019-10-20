@@ -1,0 +1,3 @@
+task install {
+  dependsOn ":annotations:build", ":annotations:publishToMavenLocal", ":processor:build", ":processor:publishToMavenLocal"
+}
