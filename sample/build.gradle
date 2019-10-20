@@ -1,0 +1,25 @@
+plugins {
+  id "org.jetbrains.kotlin.jvm" version "1.3.50"
+  id "org.jetbrains.kotlin.kapt" version "1.3.50"
+}
+
+sourceSets {
+  main.kotlin.srcDirs = ["src/main/kotlin"]
+}
+repositories {
+  jcenter()
+}
+dependencies {
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+  compileOnly project(":annotations")
+  kapt project(":processor")
+  testImplementation "org.mockito:mockito-core:${rootProject."versions.dependencies.mockito"}"
+  testImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject."versions.dependencies.junit"}"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject."versions.dependencies.junit"}"
+}
+test {
+  testLogging {
+    showStandardStreams = true
+  }
+  useJUnitPlatform()
+}
