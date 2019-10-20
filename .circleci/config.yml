@@ -25,7 +25,9 @@ jobs:
       - checkout
       - run: ./gradlew :sample:test --no-daemon --no-build-cache --refresh-dependencies
       - store_test_results:
-          path: sample/build/test-results/testJavaDebugUnitTest
+          path: sample/build/reports/tests
+      - store_test_results:
+          path: sample/build/test-results
   ensure_tag_allowed:
     docker:
       - image: circleci/node:9.9.0
