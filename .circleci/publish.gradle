@@ -1,0 +1,125 @@
+// This file requires maven-publish, java-library, signing and com.jfrog.bintray
+
+project.version = {
+  def stdout = new ByteArrayOutputStream()
+  exec {
+    commandLine "git", "describe", "--abbrev=0"
+    standardOutput = stdout
+  }
+  return stdout.toString().replaceAll("[^\\d|.]", "")
+}()
+
+jar {
+  archiveFileName = "${project.name}.jar"
+}
+
+task sourcesJar(type: Jar) {
+  group = JavaBasePlugin.DOCUMENTATION_GROUP
+  description = "Assembles a sources JAR"
+  archiveClassifier.set("sources")
+  archiveFileName = "${project.name}-sources.jar"
+  from sourceSets.main.allSource
+}
+
+task kdocJar(type: Jar) {
+  group = JavaBasePlugin.DOCUMENTATION_GROUP
+  description = "Assembles a kdoc JAR"
+  archiveClassifier.set("javadoc")
+  archiveFileName = "${project.name}-javadoc.jar"
+  from dokka
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      artifactId project.name
+      version project.version
+      artifact sourcesJar
+      artifact kdocJar
+      groupId "com.github.stoyicker.auto-factory-kotlin"
+      pom {
+        name = project.name
+        description = project.name
+        url = "https://github.com/stoyicker/auto-factory-kotlin"
+        licenses {
+          license {
+            name = "Apache-2.0"
+            url = "https://www.apache.org/licenses/LICENSE-2.0"
+          }
+        }
+        developers {
+          developer {
+            id = "stoyicker"
+            name = "Jorge Antonio Diaz-Benito Soriano"
+            email = "jorge.diazbenitosoriano@gmail.com"
+          }
+        }
+        scm {
+          connection = "scm:git:https://github.com:stoyicker/auto-factory-kotlin.git"
+          developerConnection = "scm:git:ssh:git@github.com:stoyicker/auto-factory-kotlin.git"
+          url = "https://github.com/stoyicker/auto-factory-kotlin"
+        }
+      }
+      from components.java
+    }
+  }
+  repositories {
+    maven {
+      url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+      credentials {
+        username = "$System.env.OSS_USER"
+        password = "$System.env.OSS_PASSWORD"
+      }
+    }
+  }
+}
+
+bintray {
+  user = "$System.env.BINTRAY_USER"
+  key = "$System.env.BINTRAY_API_KEY"
+  publications = ["maven"]
+  publish = true
+  pkg {
+    repo = "auto-factory-kotlin"
+    name = project.name
+    vcsUrl = "https://github.com/stoyicker/auto-factory-kotlin"
+    licenses = ["Apache-2.0"]
+    desc = "An annotation processor for Kotlin and Android that generates factories for your code. Compatible with auto-factory out of the box."
+    publicDownloadNumbers = true
+    githubRepo = "stoyicker/auto-factory-kotlin"
+    websiteUrl = "https://github.com/stoyicker/auto-factory-kotlin"
+    issueTrackerUrl = "https://github.com/stoyicker/auto-factory-kotlin/issues"
+    version {
+      name = project.version
+      vcsTag = "v${project.version}"
+      released = new Date()
+      gpg {
+        sign = true
+      }
+      mavenCentralSync {
+        user = "$System.env.OSS_USER"
+        password = "$System.env.OSS_PASSWORD"
+      }
+    }
+  }
+}
+
+// No per-release signing, Bintray does the signing before syncing to Central
+//signing {
+//  sign publishing.publications.maven
+//}
+//ext."signing.keyId" = "$System.env.GPG_KEY_ID"
+//ext."signing.password" ="$System.env.GPG_KEY_PASSWORD"
+//ext."signing.secretKeyRingFile" = "$System.env.GPG_SECRET_KEY_FILE"
+//
+//
+//task signArtifacts {
+//  doLast {
+//    signing.sign file("${buildDir}/publications/maven/pom-default.xml")
+//  }
+//}
+//
+//afterEvaluate {
+//  signArtifacts.dependsOn signMavenPublication
+//  signMavenPublication.dependsOn generatePomFileForMavenPublication
+//}

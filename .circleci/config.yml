@@ -1,0 +1,123 @@
+version: 2.1
+jobs:
+  build_annotations:
+    docker:
+      - image: circleci/openjdk:8u222-stretch
+    steps:
+      - checkout
+      - run: ./gradlew :annotations:assemble --no-daemon --no-build-cache --refresh-dependencies
+      - store_artifacts:
+          path: annotations/build/libs/annotations.jar
+          destination: annotations.jar
+  build_processor:
+    docker:
+      - image: circleci/openjdk:8u222-stretch
+    steps:
+      - checkout
+      - run: ./gradlew :processor:assemble --no-daemon --no-build-cache --refresh-dependencies
+      - store_artifacts:
+          path: processor/build/libs/processor.jar
+          destination: processor.jar
+  test_sample:
+    docker:
+      - image: circleci/openjdk:8u222-stretch
+    steps:
+      - checkout
+      - run: ./gradlew :sample:test --no-daemon --no-build-cache --refresh-dependencies
+      - store_test_results:
+          path: sample/build/test-results/testJavaDebugUnitTest
+  ensure_tag_allowed:
+    docker:
+      - image: circleci/node:9.9.0
+    steps:
+      - checkout
+      - run: ./.circleci/ensure_tag_allowed.sh
+  release_on_github:
+    docker:
+      - image: circleci/openjdk:8u222-stretch
+    steps:
+      - checkout
+      - run: ./gradlew :annotations:assemble --no-daemon --no-build-cache --refresh-dependencies
+      - run: ./gradlew :processor:assemble --no-daemon --no-build-cache --refresh-dependencies
+      - run: ./.circleci/release_github.sh
+  release_on_bintray:
+    docker:
+      - image: circleci/openjdk:8u222-stretch
+    steps:
+      - checkout
+      - run: 
+          name: Upload annotations to Bintray
+          command: ./gradlew :annotations:bintrayUpload --no-daemon --no-build-cache --refresh-dependencies
+          when: always
+      - run:
+          name: Upload processor to Bintray
+          command: ./gradlew :processor:bintrayUpload --no-daemon --no-build-cache --refresh-dependencies
+          when: always
+workflows:
+  version: 2.1
+  test_sample:
+    jobs:
+      - build_annotations:
+          filters:
+            tags:
+              ignore: /.*/
+      - build_processor:
+          filters:
+            tags:
+              ignore: /.*/
+      - test_sample:
+          requires:
+            - build_annotations
+            - build_processor
+  release:
+    jobs:
+      - ensure_tag_allowed:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - build_annotations:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+          requires:
+            - ensure_tag_allowed
+      - build_processor:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+          requires:
+            - ensure_tag_allowed
+      - test_sample:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+          requires:
+            - build_annotations
+            - build_processor
+      - release_on_github:
+          context: auto-factory-kotlin_release_github
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+          requires:
+            - test_sample
+      - release_on_bintray:
+          # Re-use this context as it goes by username rather than project. It can't be renamed though :/
+          context: test-accessors_release_bintray
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+          requires:
+            - test_sample
