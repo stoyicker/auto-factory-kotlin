@@ -85,7 +85,7 @@ class AnyFactory {
   fun create() = Any()
 }
 ```
-Factories generated this way will have methods for all constructors reachable from your extension function.
+Factories generated this way will have methods for constructors matching the signatures of all of the annotated extension methods. Therefore, if you annotate an extension method for a type which does not have a matching constructor (or it is not accessible), although the code will be generated correctly, it will not compile as the targeted constructor does not exist (or is not accessible).
 ### Default arguments
 Default arguments are respected. If a factory method is generated for a constructor which has at least one argument
 with default values, such defaults will be honored in the generated code. For example, if you have:
