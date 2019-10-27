@@ -17,5 +17,14 @@ repositories {
 dependencies {
   implementation project(":annotations")
   api "com.squareup:kotlinpoet:${rootProject."versions.dependencies.kotlinpoet"}"
+  testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:${rootProject."versions.dependencies.mockito-kotlin"}"
+  testImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject."versions.dependencies.junit"}"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject."versions.dependencies.junit"}"
+}
+test {
+  testLogging {
+    showStandardStreams = true
+  }
+  useJUnitPlatform()
 }
 apply from: Paths.get(rootDir.absolutePath, ".circleci", "publish.gradle")

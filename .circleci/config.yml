@@ -47,7 +47,7 @@ jobs:
       - image: circleci/openjdk:8u222-stretch
     steps:
       - checkout
-      - run: 
+      - run:
           name: Upload annotations to Bintray
           command: ./gradlew :annotations:bintrayUpload --no-daemon --no-build-cache --refresh-dependencies
           when: always
