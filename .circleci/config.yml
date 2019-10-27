@@ -18,6 +18,16 @@ jobs:
       - store_artifacts:
           path: processor/build/libs/processor.jar
           destination: processor.jar
+  test_processor:
+    docker:
+      - image: circleci/openjdk:8u222-stretch
+    steps:
+      - checkout
+      - run: ./gradlew :processor:test --no-daemon --no-build-cache --refresh-dependencies
+      - store_test_results:
+          path: processor/build/reports/tests
+      - store_test_results:
+          path: processor/build/test-results
   test_sample:
     docker:
       - image: circleci/openjdk:8u222-stretch
@@ -71,6 +81,10 @@ workflows:
           requires:
             - build_annotations
             - build_processor
+      - test_processor:
+          requires:
+            - build_annotations
+            - build_processor
   release:
     jobs:
       - ensure_tag_allowed:
@@ -104,6 +118,15 @@ workflows:
           requires:
             - build_annotations
             - build_processor
+      - test_processor:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+          requires:
+            - build_annotations
+            - build_processor
       - release_on_github:
           context: auto-factory-kotlin_release_github
           filters:
@@ -113,6 +136,7 @@ workflows:
               only: /^v.*/
           requires:
             - test_sample
+            - test_processor
       - release_on_bintray:
           # Re-use this context as it goes by username rather than project. It can't be renamed though :/
           context: test-accessors_release_bintray
@@ -123,3 +147,4 @@ workflows:
               only: /^v.*/
           requires:
             - test_sample
+            - test_processor
