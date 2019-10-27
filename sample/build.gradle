@@ -13,7 +13,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
   compileOnly project(":annotations")
   kapt project(":processor")
-  testImplementation "org.mockito:mockito-core:${rootProject."versions.dependencies.mockito"}"
+  testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:${rootProject."versions.dependencies.mockito-kotlin"}"
   testImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject."versions.dependencies.junit"}"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject."versions.dependencies.junit"}"
 }
