@@ -88,11 +88,11 @@ workflows:
           filters:
             tags:
               ignore: /.*/
-      - test_sample:
+      - test_processor:
           requires:
             - build_annotations
             - build_processor
-      - test_processor:
+      - test_sample:
           requires:
             - build_annotations
             - build_processor
