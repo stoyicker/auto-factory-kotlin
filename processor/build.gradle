@@ -6,6 +6,7 @@ plugins {
   id "maven-publish"
   id "com.jfrog.bintray" version "1.8.4"
   id "signing"
+  id "jacoco"
 }
 sourceSets {
   main.kotlin.srcDirs = ["src/main/kotlin"]
@@ -28,3 +29,9 @@ test {
   useJUnitPlatform()
 }
 apply from: Paths.get(rootDir.absolutePath, ".circleci", "publish.gradle")
+jacocoTestReport {
+  reports {
+    xml.enabled true
+    html.enabled false
+  }
+}

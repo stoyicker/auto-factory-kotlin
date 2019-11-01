@@ -1,6 +1,7 @@
 # auto-factory-kotlin
 ### An annotation processor for Kotlin and Android that generates factories for your code. Compatible with auto-factory out of the box.
 [![CircleCI](https://circleci.com/gh/stoyicker/auto-factory-kotlin.svg?style=svg)](https://circleci.com/gh/stoyicker/auto-factory-kotlin)
+[![codecov](https://codecov.io/gh/stoyicker/auto-factory-kotlin/branch/master/graph/badge.svg)](https://codecov.io/gh/stoyicker/auto-factory-kotlin)
 ## Usage
 [ ![Download](https://api.bintray.com/packages/stoyicker/auto-factory-kotlin/annotations/images/download.svg) ](https://search.maven.org/search?q=g:com.github.stoyicker.auto-factory-kotlin)
 

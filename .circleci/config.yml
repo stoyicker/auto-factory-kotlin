@@ -38,6 +38,17 @@ jobs:
           path: sample/build/reports/tests
       - store_test_results:
           path: sample/build/test-results
+  codecov:
+    docker:
+      - image: circleci/openjdk:8u232-stretch
+    steps:
+      - checkout
+      - run: ./gradlew :processor:test :processor:jacocoTestReport --no-daemon --no-build-cache --refresh-dependencies
+      - run: bash <(curl -s https://codecov.io/bash)
+      - store_test_results:
+          path: processor/build/jacoco
+      - store_test_results:
+          path: sample/build/jacoco
   ensure_tag_allowed:
     docker:
       - image: circleci/node:9.9.0
@@ -82,6 +93,10 @@ workflows:
             - build_annotations
             - build_processor
       - test_processor:
+          requires:
+            - build_annotations
+            - build_processor
+      - codecov:
           requires:
             - build_annotations
             - build_processor
