@@ -74,7 +74,7 @@ internal class ContextVerifierTest {
     verify(enclosingElement).getAnnotation(AutoFactory::class.java)
     verify(messager).printMessage(Diagnostic.Kind.WARNING, ERROR_ANNOTATED_CONSTRUCTOR_IN_ANNOTATED_CLASS, element)
     verifyNoMoreInteractions(element, enclosingElement, annotation)
-    assertTrue(actual)
+    assertFalse(actual)
   }
 
   @Test
