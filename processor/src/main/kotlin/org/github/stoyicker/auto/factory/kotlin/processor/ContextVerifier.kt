@@ -17,8 +17,10 @@ internal class ContextVerifier(private val messager: Messager) {
       } else {
         if (enclosingElement.getAnnotation(AutoFactory::class.java) != null) {
           messager.printMessage(Diagnostic.Kind.WARNING, ERROR_ANNOTATED_CONSTRUCTOR_IN_ANNOTATED_CLASS, element)
+          false
+        } else {
+          true
         }
-        true
       }
     }
     else -> {
