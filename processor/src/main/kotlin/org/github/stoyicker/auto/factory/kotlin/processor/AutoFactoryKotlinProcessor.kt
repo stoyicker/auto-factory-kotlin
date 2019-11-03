@@ -28,9 +28,29 @@ internal class AutoFactoryKotlinProcessor(
   }
 
   override fun process(typeElements: MutableSet<out TypeElement>, roundEnvironment: RoundEnvironment): Boolean {
-    supportedAnnotationClasses.forEach { annotationClass ->
-      roundEnvironment.getElementsAnnotatedWith(annotationClass)
-          .filter { contextVerifier.verify(it) }
+    if (!roundEnvironment.errorRaised()) {
+      supportedAnnotationClasses.forEach { annotationClass ->
+        roundEnvironment.getElementsAnnotatedWith(annotationClass)
+            .filter { contextVerifier.verify(it) }
+            // TODO Change this to onEach and delegate it away to put it on a map of k(?)class to constructors
+//            .flatMap {
+//              when {
+//                it.kMetadata() is KotlinClassMetadata.Class -> it.toKmClass().constructors.filter { constructor ->
+//                  Flag.IS_PUBLIC(constructor.flags)
+//                  // TODO Include internal constructors if it's not a typealias
+//                }
+//                else -> {
+//                  processingEnv.messager.printMessage(
+//                      Diagnostic.Kind.ERROR,
+//                      "Unsupported annotation target kClass type ${it.kMetadata().let {
+//                        metadata -> if (metadata == null) null else metadata::class.java.name
+//                      }}, should have been checked by the verifier",
+//                      it)
+//                  emptyList()
+//                }
+//              }
+//            }
+      }
     }
     return true
   }

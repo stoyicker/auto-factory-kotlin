@@ -47,7 +47,21 @@ internal class AutoFactoryKotlinProcessorTest {
   }
 
   @Test
-  fun process() {
+  fun processErrorRaised() {
+    val typeElements = mock<MutableSet<TypeElement>>()
+    val roundEnvironment = mock<RoundEnvironment> {
+      whenever(mock.errorRaised()).thenReturn(true)
+    }
+
+    val actual = subject.process(typeElements, roundEnvironment)
+
+    verify(roundEnvironment).errorRaised()
+    verifyNoMoreInteractions(typeElements, roundEnvironment)
+    assertTrue(actual)
+  }
+
+  @Test
+  fun processNoErrorRaised() {
     val annotationClass = AutoFactory::class.java
     val annotationClassesIterator = mock<Iterator<Class<out Annotation>>> {
       whenever(mock.hasNext()).thenReturn(true, false)
@@ -64,6 +78,7 @@ internal class AutoFactoryKotlinProcessorTest {
       whenever(mock.iterator()).thenReturn(annotatedElementsIterator)
     }
     val roundEnvironment = mock<RoundEnvironment> {
+      whenever(mock.errorRaised()).thenReturn(false)
       whenever(mock.getElementsAnnotatedWith(annotationClass)).thenReturn(annotatedElements)
     }
     val contextVerifier = mock<ContextVerifier> {
@@ -72,6 +87,7 @@ internal class AutoFactoryKotlinProcessorTest {
 
     val actual = subject.process(typeElements, roundEnvironment)
 
+    verify(roundEnvironment).errorRaised()
     verify(supportedAnnotationClasses).iterator()
     verify(annotationClassesIterator, times(2)).hasNext()
     verify(annotationClassesIterator).next()
