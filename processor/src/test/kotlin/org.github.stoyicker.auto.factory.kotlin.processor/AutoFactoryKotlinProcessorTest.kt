@@ -66,7 +66,49 @@ internal class AutoFactoryKotlinProcessorTest {
   }
 
   @Test
-  fun processNoErrorRaised() {
+  fun processNoErrorRaisedWithoutAnnotatedElements() {
+    val annotationClass = AutoFactory::class.java
+    val annotationClassesIterator = mock<Iterator<Class<out Annotation>>> {
+      whenever(mock.hasNext()).thenReturn(true, false)
+      whenever(mock.next()).thenReturn(annotationClass)
+      whenever(supportedAnnotationClasses.iterator()).thenReturn(mock)
+    }
+    val typeElements = mock<MutableSet<TypeElement>>()
+    val annotatedElementsIterator = mock<Iterator<Element>> {
+      whenever(mock.hasNext()).thenReturn(false)
+    }
+    val annotatedElements = mock<Set<Element>> {
+      whenever(mock.iterator()).thenReturn(annotatedElementsIterator)
+    }
+    val roundEnvironment = mock<RoundEnvironment> {
+      whenever(mock.errorRaised()).thenReturn(false)
+      whenever(mock.getElementsAnnotatedWith(annotationClass)).thenReturn(annotatedElements)
+    }
+    val contextVerifier = mock<ContextVerifier> {
+      subject.contextVerifier = mock
+    }
+
+    val actual = subject.process(typeElements, roundEnvironment)
+
+    verify(roundEnvironment).errorRaised()
+    verify(supportedAnnotationClasses).iterator()
+    verify(annotationClassesIterator, times(2)).hasNext()
+    verify(annotationClassesIterator).next()
+    verify(roundEnvironment).getElementsAnnotatedWith(annotationClass)
+    verify(annotatedElements).iterator()
+    verify(annotatedElementsIterator).hasNext()
+    verifyNoMoreInteractions(
+        annotationClassesIterator,
+        typeElements,
+        annotatedElementsIterator,
+        annotatedElements,
+        roundEnvironment,
+        contextVerifier)
+    assertTrue(actual)
+  }
+
+  @Test
+  fun processNoErrorRaisedWithAnnotatedElements() {
     val annotationClass = AutoFactory::class.java
     val annotationClassesIterator = mock<Iterator<Class<out Annotation>>> {
       whenever(mock.hasNext()).thenReturn(true, false)
@@ -104,6 +146,7 @@ internal class AutoFactoryKotlinProcessorTest {
     verifyNoMoreInteractions(
         annotationClassesIterator,
         typeElements,
+        annotatedElement,
         annotatedElementsIterator,
         annotatedElements,
         roundEnvironment,
