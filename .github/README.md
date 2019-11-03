@@ -54,9 +54,9 @@ class SomeClassFactory(@Named("AQualifier") private val providedDepAProvider: Pr
 ```
 ## Features
 ### Annotation targets
-Both constructors and classes can be annotated. If you annotate one or more constructors, a factory class will be 
-generated containing a method for each of them. If you annotate the class instead, a factory class with methods for 
-all of the constructors in the annotated class will be generated.
+Both classes and typealias can be annotated. If you annotate a class, the generated factory contains methods for all of 
+the public and internal constructors in the target class. If you annotate a typealias, only methods for public
+constructors will be generated to ensure that there are no scenarios where compilation could be broken. 
 ```kotlin
 class SomeClass(private val dep: String) {
   @AutoFactory
@@ -89,7 +89,7 @@ class SomeClassFactory<A : Any> {
 ```
 ### Factories for external classes
 Factories for types whose source is out of your control can be requested via typealias. For example, you can request a 
-factory for the `Any` constructors like this:
+factory for the public `Any` constructors like this:
 ```kotlin
 @AutoFactory(name = "AnyFactory") // name is not mandatory, but it is a good idea to keep name consistent with the default rules
 typealias AnyAlias = Any
@@ -98,11 +98,10 @@ The following code will be generated:
 ```kotlin
 @Generated(value = "org.github.stoyicker.auto.factory.kotlin.processor.AutoFactoryKotlinProcessor")
 @Inject
-class AnyFactory {
-  fun create() = Any()
+class AnyAliasFactory {
+  fun create() = AnyAlias()
 }
 ```
-Factories generated this way will have methods for constructors matching the signatures of all of the annotated extension methods.
 ### Default arguments
 Default arguments are respected. If a factory method is generated for a constructor which has at least one argument
 with default values, such defaults will be honored in the generated code. For example, if you have:
@@ -119,8 +118,7 @@ class SomeClassFactory {
 }
 ```
 ## Annotations and options
-This project aims to remain compatible with https://github.com/google/auto/tree/master/factory. Please check that
-repository for annotation options and documentation.
+[See the annotations for documentation.](annotations/src/main/kotlin/com/google/auto/factory)
 ### License
    Copyright 2019 Jorge Antonio Diaz-Benito Soriano
 
@@ -137,4 +135,4 @@ repository for annotation options and documentation.
    limitations under the License.
 
 The annotations module is derived from the [annotations at google/auto](https://github.com/google/auto/tree/6c2c1a3ff8d2abc74755dfe18c07fa60ee1c7733/factory/src/main/java/com/google/auto/factory)
-with minor modifications to their documentation.
+with minor modifications to their source documentation.
