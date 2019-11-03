@@ -118,7 +118,7 @@ class SomeClassFactory {
 }
 ```
 ## Annotations and options
-[See the annotations for documentation.](annotations/src/main/kotlin/com/google/auto/factory)
+[See the annotations for documentation.](../annotations/src/main/kotlin/com/google/auto/factory)
 ### License
    Copyright 2019 Jorge Antonio Diaz-Benito Soriano
 
