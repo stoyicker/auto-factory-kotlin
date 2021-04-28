@@ -14,7 +14,6 @@ uploadReleaseToGitHub() {
 
     # Create the release in GitHub and extract its id from the response
     RESPONSE_BODY=$(curl -s \
-            -v \
             -u ${CIRCLE_USERNAME}:${GITHUB_TOKEN} \
             --header "Accept: application/vnd.github.v3+json" \
             --header "Content-Type: application/json; charset=utf-8" \
@@ -32,7 +31,6 @@ uploadReleaseToGitHub() {
     # Attach annotations
     ANNOTATIONS_UPLOAD_URL=$(echo ${UPLOAD_URL} | sed "s/{?name,label}/?name=annotations-${THIS_TAG}.jar/")
     curl -s \
-        -v \
         -u ${CIRCLE_USERNAME}:${GITHUB_TOKEN} \
         --header "Accept: application/vnd.github.v3+json" \
         --header "Content-Type: application/zip" \
@@ -45,7 +43,6 @@ uploadReleaseToGitHub() {
     # Attach processor
     PROCESSOR_UPLOAD_URL=$(echo ${UPLOAD_URL} | sed "s/{?name,label}/?name=processor-${THIS_TAG}.jar/")
     curl -s \
-        -v \
         -u ${CIRCLE_USERNAME}:${GITHUB_TOKEN} \
         --header "Accept: application/vnd.github.v3+json" \
         --header "Content-Type: application/zip" \
